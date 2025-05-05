@@ -1,0 +1,58 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        BUILDKIT_INLINE_CACHE: 1
+    shm_size: 8gb
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./app:/app/app
+      - ./background:/app/background
+      - ./music:/app/music
+      - ./Sounds:/app/Sounds
+      - ./processed_videos:/app/processed_videos
+    environment:
+      - MAX_CONCURRENT_VIDEOS=${MAX_CONCURRENT_VIDEOS:-0}
+      - VIDEO_RETENTION_MINUTES=${VIDEO_RETENTION_MINUTES:-60}
+      - WHISPER_MODEL=${WHISPER_MODEL:-base}
+      - WHISPER_THREADS=${WHISPER_THREADS:-0}
+      - WORKERS=${WORKERS:-0}
+      - WORKER_ID=${WORKER_ID:-0}
+      - FFMPEG_THREADS=${FFMPEG_THREADS:-0}
+      - VIDEO_CRF=${VIDEO_CRF:-26}
+      - VIDEO_PRESET=${VIDEO_PRESET:-ultrafast}
+      - AUDIO_BITRATE=${AUDIO_BITRATE:-192k}
+      - MAX_CACHE_SIZE=${MAX_CACHE_SIZE:-100}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: '${CPU_LIMIT:-0}'
+          memory: '${MEMORY_LIMIT:-0}'
+        reservations:
+          cpus: '1'
+          memory: '2G'
+    networks:
+      - app-network
+  
+  cloudflare:
+    image: cloudflare/cloudflared:latest
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - app
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge 

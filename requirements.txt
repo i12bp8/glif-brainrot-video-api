@@ -1,0 +1,26 @@
+# Core dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.23.2
+python-multipart==0.0.6
+httpx==0.25.1
+pydantic==2.4.2
+python-dotenv==1.0.0
+watchdog==3.0.0
+
+# Data processing
+numpy==1.26.1
+Pillow==10.1.0
+opencv-python-headless==4.8.1.78
+
+# Video processing
+ffmpeg-python==0.2.0
+moviepy==1.0.3
+decorator==4.4.2
+
+# Audio transcription
+# For PyTorch, we recommend:
+# pip install --extra-index-url https://download.pytorch.org/whl/cpu torch==2.1.1+cpu torchaudio==2.1.1+cpu
+torch==2.1.1
+torchaudio==2.1.1
+openai-whisper==20231117
+whisper-timestamped==1.15.8 
